@@ -19,6 +19,7 @@ def main():
     # TODO(tfoote) add prebuilt images for faster operations 
     # parser.add_argument('--develop', action='store_true',
     #    help='Build the image locally not using the prebuilt image.')
+    parser.add_argument('--config', type=str, nargs="+", action='append', default=None)
     parser.add_argument('--port', type=int, action='store', default='4000')
     parser.add_argument('--baseurl', type=str, action='store', default=None)
     parser.add_argument('-v', '--version', action='version',
@@ -47,6 +48,10 @@ def main():
         if args.baseurl is not None:
             # Don't output to the default location if generating using a modified baseurl
             args_dict['command'] += ' --baseurl=\'{baseurl}\' -d /tmp/aliased_site'.format(**args_dict)
+
+    if args.config:
+        config_args = ' '.join(args.config[0])
+        args_dict['command'] += ' --config={config_args}'.format(**locals())
 
     active_extensions = extension_manager.get_active_extensions(args_dict)
     print("Active extensions %s" % [e.get_name() for e in active_extensions])
