@@ -21,6 +21,7 @@ def main():
     #    help='Build the image locally not using the prebuilt image.')
     parser.add_argument('--config', type=str, nargs="+", action='append', default=None)
     parser.add_argument('--port', type=int, action='store', default='4000')
+    parser.add_argument('--url', type=str, action='store', default=None)
     parser.add_argument('--baseurl', type=str, action='store', default=None)
     parser.add_argument('-v', '--version', action='version',
         version='%(prog)s ' + get_rocker_version())
@@ -40,17 +41,25 @@ def main():
     if args.build_only and args.baseurl:
         parser.error("build and baseurl options are incompatible")
 
+    if args.build_only and args.url:
+        parser.error("build and url options are incompatible")
+
     if args.build_only:
         args_dict['command'] = 'jekyll build -V --trace'
         del args_dict['network']
     else:
         args_dict['command'] = 'jekyll serve -w'
+
+        if args.url is not None:
+            # Don't output to the default location if generating using a modified baseurl
+            args_dict['command'] += ' --host=\'{url}\''.format(**args_dict)
+
         if args.baseurl is not None:
             # Don't output to the default location if generating using a modified baseurl
             args_dict['command'] += ' --baseurl=\'{baseurl}\' -d /tmp/aliased_site'.format(**args_dict)
 
     if args.config:
-        config_args = ' '.join(args.config[0])
+        config_args = ','.join(args.config[0])
         args_dict['command'] += ' --config={config_args}'.format(**locals())
 
     active_extensions = extension_manager.get_active_extensions(args_dict)
