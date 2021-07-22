@@ -50,7 +50,7 @@ def main():
             args_dict['command'] += ' --baseurl=\'{baseurl}\' -d /tmp/aliased_site'.format(**args_dict)
 
     if args.config:
-        config_args = ' '.join(args.config[0])
+        config_args = ','.join(args.config[0])
         args_dict['command'] += ' --config={config_args}'.format(**locals())
 
     active_extensions = extension_manager.get_active_extensions(args_dict)
