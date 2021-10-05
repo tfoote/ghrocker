@@ -4,6 +4,7 @@ RUN echo "gem: --no-ri --no-rdoc" > ~/.gemrc
 RUN gem install bundler
 RUN gem install jekyll
 RUN gem install github-pages
+RUN gem install jekyll-include-cache
 
 EXPOSE 4000
 VOLUME /tmp/jekyll
