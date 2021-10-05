@@ -47,7 +47,7 @@ class GHPages(RockerExtension):
         args = ''
         args += ' -v ' + shlex.quote('{directory}:/tmp/jekyll'.format(**cli_args))
         if cli_args.get('network', None):
-            args += ' -p ' + shlex.quote('0.0.0.0:{port}:{port}'.format(**cli_args))
+            args += ' -w /tmp/jekyll -p ' + shlex.quote('0.0.0.0:{port}:{port}'.format(**cli_args))
         return args
 
     @staticmethod

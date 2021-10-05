@@ -7,5 +7,3 @@ RUN gem install github-pages
 RUN gem install jekyll-include-cache
 
 EXPOSE 4000
-VOLUME /tmp/jekyll
-WORKDIR /tmp/jekyll
