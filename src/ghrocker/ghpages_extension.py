@@ -44,10 +44,10 @@ class GHPages(RockerExtension):
         return em.expand(snippet, {})
 
     def get_docker_args(self, cli_args):
-        args = ''
+        args = ' -w /tmp/jekyll'
         args += ' -v ' + shlex.quote('{directory}:/tmp/jekyll'.format(**cli_args))
         if cli_args.get('network', None):
-            args += ' -w /tmp/jekyll -p ' + shlex.quote('0.0.0.0:{port}:{port}'.format(**cli_args))
+            args += ' -p ' + shlex.quote('0.0.0.0:{port}:{port}'.format(**cli_args))
         return args
 
     @staticmethod
