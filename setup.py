@@ -9,7 +9,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='ghrocker',
-    version="0.0.3",
+    version="0.0.4",
     packages=['ghrocker'],
     package_dir={'': 'src'},
     package_data={'ghrocker': ['templates/*.em']},
