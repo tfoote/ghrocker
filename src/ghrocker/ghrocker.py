@@ -20,7 +20,6 @@ def main():
     # parser.add_argument('--develop', action='store_true',
     #    help='Build the image locally not using the prebuilt image.')
     parser.add_argument('--config', type=str, nargs="+", action='append', default=None)
-    parser.add_argument('--port', type=int, action='store', default='4000')
     parser.add_argument('--baseurl', type=str, action='store', default=None)
     parser.add_argument('-v', '--version', action='version',
         version='%(prog)s ' + get_rocker_version())
