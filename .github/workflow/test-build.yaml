@@ -1,5 +1,5 @@
 name: test_build
-on: [push, pr]
+on: [push, pull_request]
 jobs:
   Run-Test-Build:
     runs-on: ubuntu-latest
