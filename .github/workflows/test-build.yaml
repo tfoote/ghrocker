@@ -1,0 +1,21 @@
+name: test_build
+on: [push, pull_request]
+jobs:
+  Run-Test-Build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+      - name: Install ghrocker
+        run: |
+          pip install .
+      - name: Test build
+        run: |
+          pwd
+          ghrocker --build -- test/test_site
