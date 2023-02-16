@@ -1,0 +1,20 @@
+name: test_build
+on: [push, pr]
+jobs:
+  Run-Test-Build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install jekyll
+          python -m pip install --upgrade pip
+          pip install .
+      - name: Generate test_site
+        run: jekyll new test_site
+      - name: Test build
+        run: ghrocker --build -- test_site
