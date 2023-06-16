@@ -3,7 +3,8 @@ RUN apt-get update && apt-get install -q -y curl net-tools python3 python3-yaml 
 RUN echo "gem: --no-document" > ~/.gemrc
 RUN gem install bundler
 RUN gem install jekyll
-RUN gem install github-pages
+# Add -f to override conflicting executable between sass and sass-embedded
+RUN gem install -f github-pages
 RUN gem install jekyll-include-cache
 
 EXPOSE 4000
