@@ -24,11 +24,9 @@ from rocker.em import empy_expand
 
 class GHPages(RockerExtension):
 
-    name = 'ghpages'
-
-    @classmethod
-    def get_name(cls):
-        return cls.name
+    @staticmethod
+    def get_name():
+        return 'ghpages'
 
     def precondition_environment(self, cli_args):
         pass
@@ -40,7 +38,7 @@ class GHPages(RockerExtension):
         return ''
 
     def get_snippet(self, cliargs):
-        snippet = pkgutil.get_data('ghrocker', 'templates/%s_snippet.Dockerfile.em' % self.name).decode('utf-8')
+        snippet = pkgutil.get_data('ghrocker', 'templates/%s_snippet.Dockerfile.em' % self.get_name()).decode('utf-8')
         return empy_expand(snippet, {})
 
     def get_docker_args(self, cli_args):
