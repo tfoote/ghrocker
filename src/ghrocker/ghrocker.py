@@ -55,7 +55,7 @@ def main():
     active_extensions = extension_manager.get_active_extensions(args_dict)
     print("Active extensions %s" % [e.get_name() for e in active_extensions])
 
-    dig = DockerImageGenerator(active_extensions, args_dict, 'ubuntu:jammy')
+    dig = DockerImageGenerator(active_extensions, args_dict, 'ruby:3.1-bookworm')
 
     exit_code = dig.build(**vars(args))
     if exit_code != 0:
