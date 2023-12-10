@@ -20,7 +20,7 @@ import shlex
 
 
 from rocker.extensions import RockerExtension
-
+from rocker.em import empy_expand
 
 class GHPages(RockerExtension):
 
@@ -41,7 +41,7 @@ class GHPages(RockerExtension):
 
     def get_snippet(self, cliargs):
         snippet = pkgutil.get_data('ghrocker', 'templates/%s_snippet.Dockerfile.em' % self.name).decode('utf-8')
-        return em.expand(snippet, {})
+        return empy_expand(snippet, {})
 
     def get_docker_args(self, cli_args):
         args = ' -w /tmp/jekyll'

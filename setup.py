@@ -22,7 +22,7 @@ setuptools.setup(
     license='Apache 2.0',
     install_requires=[
         'empy',
-        'rocker',
+        'rocker>=0.2.13',
     ],
     install_package_data=True,
     zip_safe=False,
