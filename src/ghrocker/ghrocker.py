@@ -16,11 +16,11 @@ def main():
     #parser.add_argument('command', nargs='*', default='')
     parser.add_argument('--nocache', action='store_true',
         help='Force a rebuild of the image')
-    # TODO(tfoote) add prebuilt images for faster operations 
-    # parser.add_argument('--develop', action='store_true',
-    #    help='Build the image locally not using the prebuilt image.')
+    parser.add_argument('--develop', action='store_true',
+       help='Build the image locally not using the prebuilt image.')
     parser.add_argument('--config', type=str, nargs="+", action='append', default=None)
     parser.add_argument('--baseurl', type=str, action='store', default=None)
+    parser.add_argument('--prebuilt-image', type=str, action='store', default='ghcr.io/tfoote/ghrocker/ghrocker:latest')
     parser.add_argument('-v', '--version', action='version',
         version='%(prog)s ' + get_rocker_version())
     parser.add_argument('--build-only', action='store_true')
@@ -57,7 +57,14 @@ def main():
 
     dig = DockerImageGenerator(active_extensions, args_dict, 'ruby:3.1-bookworm')
 
-    exit_code = dig.build(**vars(args))
+    #Initialize exit_code
+    exit_code = 0
+    if args.develop:
+        exit_code = dig.build(**vars(args))
+    else:
+        print(f"Skipping build for prebuilt image {args.prebuilt_image}")
+        dig.image_id = args.prebuilt_image
+        dig.built = True
     if exit_code != 0:
         print("Build failed exiting")
         return exit_code
@@ -66,3 +73,26 @@ def main():
         args_dict['command'] = 'bash'
 
     return dig.run(**args_dict)
+
+def generate_dockerfile():
+
+    parser = argparse.ArgumentParser(
+        description='Generate the dockerfile for the prebuilt image',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-v', '--version', action='version',
+        version='%(prog)s ' + get_rocker_version())
+
+    extension_manager = RockerExtensionManager()
+    default_args = {'ghpages': True, 'user': True, 'network': 'host'}
+    extension_manager.extend_cli_parser(parser, default_args)
+
+    args = parser.parse_args()
+    args_dict = vars(args)
+
+    active_extensions = extension_manager.get_active_extensions(args_dict)
+    print("Active extensions %s" % [e.get_name() for e in active_extensions])
+
+    dig = DockerImageGenerator(active_extensions, args_dict, 'ruby:3.1-bookworm')
+    with open('Dockerfile.ghrocker', 'w') as fh:
+        fh.write(dig.dockerfile)
+    return 0

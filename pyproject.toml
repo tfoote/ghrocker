@@ -27,6 +27,7 @@ dependencies = [
 
 [project.scripts]
 ghrocker = "ghrocker.ghrocker:main"
+generate_ghrocker_dockerfile = "ghrocker.ghrocker:generate_dockerfile"
 
 [project.entry-points."rocker.extensions"]
 ghpages = "ghrocker.ghpages_extension:GHPages"

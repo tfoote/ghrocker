@@ -1,7 +1,7 @@
 name: test_build
 on: [push, pull_request]
 jobs:
-  Run-Test-Build:
+  Test_Local-Build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -15,7 +15,41 @@ jobs:
       - name: Install ghrocker
         run: |
           pip install .
-      - name: Test build
+      - name: Test local build
         run: |
-          pwd
+          ghrocker --build --develop -- test/test_site
+  Test-Prebuilt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+      - name: Install ghrocker
+        run: |
+          pip install .
+      - name: Test prebuilt
+        run: |
           ghrocker --build -- test/test_site
+
+  dockerfile-generation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+      - name: Install ghrocker
+        run: |
+          pip install .
+      - name: Test Generation
+        run: |
+          generate_ghrocker_dockerfile
