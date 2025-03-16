@@ -43,8 +43,8 @@ jobs:
           file: Dockerfile.ghrocker
           load: true
           push: true
-          tags:
-            - ghcr.io/tfoote/ghrocker/ghrocker:latest
-            - ghcr.io/tfoote/ghrocker/ghrocker:${{ steps.date.outputs.date }}
+          tags: |
+            ghcr.io/tfoote/ghrocker/ghrocker:latest
+            ghcr.io/tfoote/ghrocker/ghrocker:${{ steps.date.outputs.date }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
