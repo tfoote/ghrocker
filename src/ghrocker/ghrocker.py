@@ -61,7 +61,7 @@ def main():
     if args.dockerfile_only:
         with open('Dockerfile.ghrocker', 'w') as fh:
             fh.write(dig.dockerfile)
-        return True
+        return 0
 
     exit_code = dig.build(**vars(args))
     if exit_code != 0:
