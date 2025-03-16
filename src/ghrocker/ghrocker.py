@@ -24,6 +24,7 @@ def main():
     parser.add_argument('-v', '--version', action='version',
         version='%(prog)s ' + get_rocker_version())
     parser.add_argument('--build-only', action='store_true')
+    parser.add_argument('--dockerfile-only', action='store_true')
     parser.add_argument('--debug-inside', action='store_true')
     # TODO(tfoote) add verbose parser.add_argument('--verbose', action='store_true')
 
@@ -56,6 +57,11 @@ def main():
     print("Active extensions %s" % [e.get_name() for e in active_extensions])
 
     dig = DockerImageGenerator(active_extensions, args_dict, 'ruby:3.1-bookworm')
+
+    if args.dockerfile_only:
+        with open('Dockerfile.ghrocker', 'w') as fh:
+            fh.write(dig.dockerfile)
+        return True
 
     exit_code = dig.build(**vars(args))
     if exit_code != 0:
