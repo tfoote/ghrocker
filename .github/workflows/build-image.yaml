@@ -1,7 +1,7 @@
 name: build_packages
 on:
   push:
-    branches: [ main ]
+  pr:
 defaults:
   run:
     shell: bash
@@ -42,7 +42,7 @@ jobs:
           context: .
           file: Dockerfile.ghrocker
           load: true
-          push: true
+          push: ${{ github.ref == 'refs/heads/main' }}
           tags: |
             ghcr.io/tfoote/ghrocker/ghrocker:latest
             ghcr.io/tfoote/ghrocker/ghrocker:${{ steps.date.outputs.date }}
