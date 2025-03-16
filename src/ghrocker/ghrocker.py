@@ -16,11 +16,11 @@ def main():
     #parser.add_argument('command', nargs='*', default='')
     parser.add_argument('--nocache', action='store_true',
         help='Force a rebuild of the image')
-    # TODO(tfoote) add prebuilt images for faster operations 
-    # parser.add_argument('--develop', action='store_true',
-    #    help='Build the image locally not using the prebuilt image.')
+    parser.add_argument('--develop', action='store_true',
+       help='Build the image locally not using the prebuilt image.')
     parser.add_argument('--config', type=str, nargs="+", action='append', default=None)
     parser.add_argument('--baseurl', type=str, action='store', default=None)
+    parser.add_argument('--prebuilt-image', type=str, action='store', default='ghcr.io/tfoote/ghrocker/ghrocker:latest')
     parser.add_argument('-v', '--version', action='version',
         version='%(prog)s ' + get_rocker_version())
     parser.add_argument('--build-only', action='store_true')
@@ -57,13 +57,19 @@ def main():
     print("Active extensions %s" % [e.get_name() for e in active_extensions])
 
     dig = DockerImageGenerator(active_extensions, args_dict, 'ruby:3.1-bookworm')
-
     if args.dockerfile_only:
         with open('Dockerfile.ghrocker', 'w') as fh:
             fh.write(dig.dockerfile)
         return 0
 
-    exit_code = dig.build(**vars(args))
+    #Initialize exit_code
+    exit_code = 0
+    if args.develop:
+        exit_code = dig.build(**vars(args))
+    else:
+        print(f"Skipping build for prebuilt image {args.prebuilt_image}")
+        dig.image_id = args.prebuilt_image
+        dig.built = True
     if exit_code != 0:
         print("Build failed exiting")
         return exit_code

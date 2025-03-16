@@ -15,7 +15,9 @@ jobs:
       - name: Install ghrocker
         run: |
           pip install .
-      - name: Test build
+      - name: Test prebuilt
         run: |
-          pwd
           ghrocker --build -- test/test_site
+      - name: Test local build
+        run: |
+          ghrocker --build --develop -- test/test_site
