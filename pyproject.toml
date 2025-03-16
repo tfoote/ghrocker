@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ghrocker"
+version = "0.0.9"
+authors = [
+    { name = "Tully Foote", email = "tfoote@osrfoundation.org" },
+]
+description = "A rocker extension to locally test github pages."
+readme = "README.md"
+requires-python = ">=3.6"  # Adjust as needed
+license = { text = "Apache 2.0" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "empy",
+    "rocker>=0.2.13",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/tfoote/ghrocker"
+
+[project.scripts]
+ghrocker = "ghrocker.ghrocker:main"
+
+[project.entry-points."rocker.extensions"]
+ghpages = "ghrocker.ghpages_extension:GHPages"
+
+[tool.setuptools]
+packages = ["ghrocker"]
+package-dir = {"" = "src"}
+package-data = {"ghrocker" = ["templates/*.em"]}
+zip-safe = false
