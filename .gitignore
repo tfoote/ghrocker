@@ -2,3 +2,5 @@ src/ghrocker.egg-info/*
 build
 dist
 *__pycache__*
+test/test_site/_site
+test/test_site/Gemfile.lock
