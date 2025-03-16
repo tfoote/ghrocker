@@ -1,7 +1,7 @@
 name: build_packages
 on:
   push:
-  pr:
+  pull-request:
 defaults:
   run:
     shell: bash
