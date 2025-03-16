@@ -32,14 +32,19 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
       -
-        name: Build estimator
+        name: Build ghrocker Image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile.ghrocker
           load: true
           push: true
-          tags: ghcr.io/tfoote/ghrocker/ghrocker:baseline
+          tags:
+            - ghcr.io/tfoote/ghrocker/ghrocker:latest
+            - ghcr.io/tfoote/ghrocker/ghrocker:${{ steps.date.outputs.date }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
