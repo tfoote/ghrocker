@@ -1,7 +1,7 @@
 name: build_packages
 on:
   push:
-    # branches: [ main ]
+    branches: [ main ]
 defaults:
   run:
     shell: bash
