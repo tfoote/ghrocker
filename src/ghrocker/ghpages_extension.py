@@ -28,12 +28,6 @@ class GHPages(RockerExtension):
     def get_name():
         return 'ghpages'
 
-    def precondition_environment(self, cli_args):
-        pass
-
-    def validate_environment(self, cli_args):
-        pass
-
     def get_preamble(self, cli_args):
         return ''
 
