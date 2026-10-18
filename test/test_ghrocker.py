@@ -66,6 +66,7 @@ def test_prebuilt_image_with_two_different_user_ids():
         docker_cmd = dig.generate_docker_cmd(command='jekyll build -V --trace')
         assert '-w /tmp/jekyll' in docker_cmd
         assert ':/tmp/jekyll' in docker_cmd
+        assert '-e JEKYLL_NO_BUNDLER_REQUIRE=true' in docker_cmd
 
     # First invocation layers UID 1001 (user_one) onto the prebuilt image
     assert '--uid "1001"' in dig_user_one.dockerfile
@@ -104,6 +105,8 @@ def test_develop_mode_includes_ghpages_and_user():
     assert 'RUN gem install jekyll' in dig.dockerfile
     assert '--uid "1000"' in dig.dockerfile
     assert 'USER dev_user' in dig.dockerfile
+    docker_cmd = dig.generate_docker_cmd(command='jekyll build -V --trace')
+    assert '-e JEKYLL_NO_BUNDLER_REQUIRE=true' not in docker_cmd
 
 
 @pytest.fixture
