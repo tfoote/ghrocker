@@ -1,6 +1,24 @@
 name: test_build
 on: [push, pull_request]
 jobs:
+  Unit-Tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+      - name: Install ghrocker with test dependencies
+        run: |
+          pip install .[test]
+      - name: Run unit tests
+        run: |
+          pytest -v
+
   Test_Local-Build:
     runs-on: ubuntu-latest
     steps:
@@ -32,9 +50,17 @@ jobs:
       - name: Install ghrocker
         run: |
           pip install .
-      - name: Test prebuilt
+      - name: Test prebuilt as default user
         run: |
           ghrocker --build -- test/test_site
+          test "$(stat -c '%u:%g' test/test_site/_site/index.html)" = "$(id -u):$(id -g)"
+      - name: Test prebuilt as second user ID
+        run: |
+          sudo useradd -m -u 2000 -G docker testuser
+          sudo chown -R testuser:testuser test/test_site
+          sudo chmod -R u+rwX,go+rX,go-w test/test_site
+          sudo -u testuser "$(which ghrocker)" --build -- test/test_site
+          test "$(stat -c '%u:%g' test/test_site/_site/index.html)" = "2000:2000"
 
   dockerfile-generation:
     runs-on: ubuntu-latest
@@ -53,3 +79,4 @@ jobs:
       - name: Test Generation
         run: |
           generate_ghrocker_dockerfile
+          ! grep -q "useradd" Dockerfile.ghrocker

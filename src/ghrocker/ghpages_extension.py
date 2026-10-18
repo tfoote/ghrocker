@@ -32,6 +32,8 @@ class GHPages(RockerExtension):
         return ''
 
     def get_snippet(self, cliargs):
+        if not cliargs.get('develop', True):
+            return ''
         snippet = pkgutil.get_data('ghrocker', 'templates/%s_snippet.Dockerfile.em' % self.get_name()).decode('utf-8')
         return empy_expand(snippet, {})
 

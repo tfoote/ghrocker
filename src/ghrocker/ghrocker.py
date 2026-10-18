@@ -7,7 +7,7 @@ from rocker.core import get_rocker_version
 from rocker.core import RockerExtensionManager
 
 
-def main():
+def main(argv=None):
 
     parser = argparse.ArgumentParser(
         description='A tool for building and testing gh-pages locally',
@@ -32,7 +32,7 @@ def main():
     default_args = {'ghpages': True, 'user': True, 'network': 'host'}
     extension_manager.extend_cli_parser(parser, default_args)
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     args_dict = vars(args)
     args_dict['directory'] = os.path.abspath(args_dict['directory'])
 
@@ -55,16 +55,10 @@ def main():
     active_extensions = extension_manager.get_active_extensions(args_dict)
     print("Active extensions %s" % [e.get_name() for e in active_extensions])
 
-    dig = DockerImageGenerator(active_extensions, args_dict, 'ruby:3.1-bookworm')
+    base_image = 'ruby:3.1-bookworm' if args.develop else args.prebuilt_image
+    dig = DockerImageGenerator(active_extensions, args_dict, base_image)
 
-    #Initialize exit_code
-    exit_code = 0
-    if args.develop:
-        exit_code = dig.build(**vars(args))
-    else:
-        print(f"Skipping build for prebuilt image {args.prebuilt_image}")
-        dig.image_id = args.prebuilt_image
-        dig.built = True
+    exit_code = dig.build(**vars(args))
     if exit_code != 0:
         print("Build failed exiting")
         return exit_code
@@ -74,7 +68,7 @@ def main():
 
     return dig.run(**args_dict)
 
-def generate_dockerfile():
+def generate_dockerfile(argv=None):
 
     parser = argparse.ArgumentParser(
         description='Generate the dockerfile for the prebuilt image',
@@ -83,10 +77,10 @@ def generate_dockerfile():
         version='%(prog)s ' + get_rocker_version())
 
     extension_manager = RockerExtensionManager()
-    default_args = {'ghpages': True, 'user': True, 'network': 'host'}
+    default_args = {'ghpages': True}
     extension_manager.extend_cli_parser(parser, default_args)
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     args_dict = vars(args)
 
     active_extensions = extension_manager.get_active_extensions(args_dict)
