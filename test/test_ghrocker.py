@@ -1,6 +1,8 @@
+import os
 import pwd
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
+import pytest
 from rocker.core import DockerImageGenerator
 
 from ghrocker.ghrocker import generate_dockerfile, main
@@ -102,3 +104,90 @@ def test_develop_mode_includes_ghpages_and_user():
     assert 'RUN gem install jekyll' in dig.dockerfile
     assert '--uid "1000"' in dig.dockerfile
     assert 'USER dev_user' in dig.dockerfile
+
+
+@pytest.fixture
+def mock_dig():
+    with patch('ghrocker.ghrocker.DockerImageGenerator') as mock_class:
+        instance = MagicMock()
+        instance.build.return_value = 0
+        instance.run.return_value = 0
+        mock_class.return_value = instance
+        yield instance
+
+
+def test_default_mode(mock_dig):
+    ret = main(['test/test_site'])
+    assert ret == 0
+    assert mock_dig.run.called
+    kwargs = mock_dig.run.call_args[1]
+    assert kwargs['command'] == 'jekyll serve -w'
+    assert kwargs.get('network') == 'host'
+    assert kwargs['build_only'] is False
+    assert kwargs['serve_only'] is False
+
+
+def test_default_mode_with_baseurl(mock_dig):
+    ret = main(['test/test_site', '--baseurl', '/blog'])
+    assert ret == 0
+    assert mock_dig.run.called
+    kwargs = mock_dig.run.call_args[1]
+    assert kwargs['command'] == "jekyll serve -w --baseurl='/blog' -d /tmp/aliased_site"
+
+
+def test_build_only_mode(mock_dig):
+    ret = main(['test/test_site', '--build-only'])
+    assert ret == 0
+    assert mock_dig.run.called
+    kwargs = mock_dig.run.call_args[1]
+    assert kwargs['command'] == 'jekyll build -V --trace'
+    assert 'network' not in kwargs
+    assert kwargs['build_only'] is True
+    assert kwargs['serve_only'] is False
+
+
+def test_build_alias_mode(mock_dig):
+    ret = main(['test/test_site', '--build'])
+    assert ret == 0
+    assert mock_dig.run.called
+    kwargs = mock_dig.run.call_args[1]
+    assert kwargs['command'] == 'jekyll build -V --trace'
+    assert 'network' not in kwargs
+    assert kwargs['build_only'] is True
+
+
+def test_serve_only_mode(mock_dig):
+    ret = main(['test/test_site', '--serve-only'])
+    assert ret == 0
+    assert mock_dig.run.called
+    kwargs = mock_dig.run.call_args[1]
+    assert kwargs['command'] == 'jekyll serve --skip-initial-build --no-watch'
+    assert kwargs.get('network') == 'host'
+    assert kwargs['serve_only'] is True
+    assert kwargs['build_only'] is False
+
+
+def test_serve_only_mode_with_baseurl(mock_dig):
+    ret = main(['test/test_site', '--serve-only', '--baseurl', '/blog'])
+    assert ret == 0
+    assert mock_dig.run.called
+    kwargs = mock_dig.run.call_args[1]
+    assert kwargs['command'] == "jekyll serve --skip-initial-build --no-watch --baseurl='/blog' -d /tmp/aliased_site"
+
+
+def test_config_option(mock_dig):
+    ret = main(['test/test_site', '--serve-only', '--config', '_config.yml,_config_dev.yml'])
+    assert ret == 0
+    assert mock_dig.run.called
+    kwargs = mock_dig.run.call_args[1]
+    assert kwargs['command'] == 'jekyll serve --skip-initial-build --no-watch --config=_config.yml,_config_dev.yml'
+
+
+def test_incompatible_build_and_serve_only(mock_dig):
+    with pytest.raises(SystemExit):
+        main(['test/test_site', '--build-only', '--serve-only'])
+
+
+def test_incompatible_build_and_baseurl(mock_dig):
+    with pytest.raises(SystemExit):
+        main(['test/test_site', '--build-only', '--baseurl', '/blog'])

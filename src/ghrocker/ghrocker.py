@@ -23,7 +23,10 @@ def main(argv=None):
     parser.add_argument('--prebuilt-image', type=str, action='store', default='ghcr.io/tfoote/ghrocker/ghrocker:latest')
     parser.add_argument('-v', '--version', action='version',
         version='%(prog)s ' + get_rocker_version())
-    parser.add_argument('--build-only', action='store_true')
+    parser.add_argument('--build-only', '--build', action='store_true', dest='build_only',
+        help='Build the site and exit without serving')
+    parser.add_argument('--serve-only', action='store_true',
+        help='Serve the pre-built site without initial rebuild or file watching')
     parser.add_argument('--debug-inside', action='store_true')
     # TODO(tfoote) add verbose parser.add_argument('--verbose', action='store_true')
 
@@ -39,9 +42,17 @@ def main(argv=None):
     if args.build_only and args.baseurl:
         parser.error("build and baseurl options are incompatible")
 
+    if args.build_only and args.serve_only:
+        parser.error("build-only and serve-only options are incompatible")
+
     if args.build_only:
         args_dict['command'] = 'jekyll build -V --trace'
         del args_dict['network']
+    elif args.serve_only:
+        args_dict['command'] = 'jekyll serve --skip-initial-build --no-watch'
+        if args.baseurl is not None:
+            # Don't output to the default location if generating using a modified baseurl
+            args_dict['command'] += ' --baseurl=\'{baseurl}\' -d /tmp/aliased_site'.format(**args_dict)
     else:
         args_dict['command'] = 'jekyll serve -w'
         if args.baseurl is not None:
