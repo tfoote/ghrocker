@@ -22,6 +22,11 @@ dependencies = [
     "rocker>=0.2.13",
 ]
 
+[project.optional-dependencies]
+test = [
+    "pytest",
+]
+
 [project.urls]
 "Homepage" = "https://github.com/tfoote/ghrocker"
 

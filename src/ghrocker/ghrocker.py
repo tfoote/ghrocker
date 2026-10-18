@@ -7,7 +7,7 @@ from rocker.core import get_rocker_version
 from rocker.core import RockerExtensionManager
 
 
-def main():
+def main(argv=None):
 
     parser = argparse.ArgumentParser(
         description='A tool for building and testing gh-pages locally',
@@ -32,7 +32,7 @@ def main():
     default_args = {'ghpages': True, 'user': True, 'network': 'host'}
     extension_manager.extend_cli_parser(parser, default_args)
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     args_dict = vars(args)
     args_dict['directory'] = os.path.abspath(args_dict['directory'])
 
@@ -68,7 +68,7 @@ def main():
 
     return dig.run(**args_dict)
 
-def generate_dockerfile():
+def generate_dockerfile(argv=None):
 
     parser = argparse.ArgumentParser(
         description='Generate the dockerfile for the prebuilt image',
@@ -80,7 +80,7 @@ def generate_dockerfile():
     default_args = {'ghpages': True}
     extension_manager.extend_cli_parser(parser, default_args)
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     args_dict = vars(args)
 
     active_extensions = extension_manager.get_active_extensions(args_dict)
